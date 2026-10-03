@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>APEX PARENTS</title>
+<link rel="manifest" href="manifest.webmanifest">
+<meta name="theme-color" content="#14213D">
+<link rel="icon" type="image/png" href="icons/icon-192.png">
+<link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="APEX PARENTS">
+<style>
+:root{--navy:#14213D;--or:#E07B1F;--bg:#F3F5F9;--card:#fff;--tx:#1b2433;--mut:#5d6879;--bd:#d9dee8;--ok:#1f8a4c;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#0d1424;--card:#172139;--tx:#e8ecf4;--mut:#9aa6bb;--bd:#2a3752}}
+:root[data-theme="dark"]{--bg:#0d1424;--card:#172139;--tx:#e8ecf4;--mut:#9aa6bb;--bd:#2a3752}
+*{box-sizing:border-box}html{scroll-padding-top:env(safe-area-inset-top,0px)}
+body{margin:0;background:var(--bg);color:var(--tx);font:15px/1.45 "Segoe UI",Roboto,Arial,sans-serif}
+header{background:var(--navy);color:#fff;padding:14px 16px;border-bottom:4px solid var(--or)}
+header h1{margin:0;font-size:20px;letter-spacing:.3px}header p{margin:2px 0 0;font-size:12px;opacity:.8}
+main{max-width:900px;margin:0 auto;padding:12px}
+nav{display:flex;gap:6px;margin-bottom:12px}
+nav button{flex:1;padding:10px 4px;border:1px solid var(--bd);background:var(--card);color:var(--tx);border-radius:8px;font-weight:600;cursor:pointer}
+nav button.on{background:var(--navy);color:#fff;border-color:var(--navy)}
+.card{background:var(--card);border:1px solid var(--bd);border-radius:10px;padding:12px;margin-bottom:12px}
+label{display:block;font-size:13px;color:var(--mut);margin:8px 0 3px}
+input,select,textarea{width:100%;padding:10px;border:1px solid var(--bd);border-radius:8px;background:var(--bg);color:var(--tx);font:inherit}
+textarea{min-height:110px;resize:vertical}
+.row{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.btn{padding:10px 14px;border:0;border-radius:8px;font-weight:600;cursor:pointer;color:#fff;background:var(--navy);text-decoration:none;display:inline-block;font-size:14px}
+.btn.or{background:var(--or)}.btn.wa{background:#1fa855}.btn.sms{background:#2f6fd0}.btn.gr{background:var(--mut)}.btn.sm{padding:7px 10px;font-size:13px}
+.bar{display:flex;gap:6px;flex-wrap:wrap;margin:8px 0}
+.item{display:flex;gap:8px;align-items:center;padding:10px 0;border-top:1px solid var(--bd)}
+.item:first-child{border-top:0}.item .i{flex:1;min-width:0}.item b{display:block}.item small{color:var(--mut)}
+.item input[type=checkbox]{width:20px;height:20px;flex:none}
+.acts{display:flex;gap:5px;flex-wrap:wrap;justify-content:flex-end}
+.tag{display:inline-block;background:var(--or);color:#fff;border-radius:20px;padding:1px 9px;font-size:12px;margin-right:4px}
+.sent{color:var(--ok);font-weight:600;font-size:12px}
+.empty{text-align:center;color:var(--mut);padding:24px 8px}
+footer{text-align:center;color:var(--mut);font-size:12px;padding:14px}
+.hide{display:none}
+:focus-visible{outline:3px solid var(--or);outline-offset:2px}
+</style>
+</head>
+<body>
+<header><h1>APEX PARENTS</h1><p>Gestion des parents d'élèves · SMS et WhatsApp</p></header>
+<main>
+<div id="inst" class="card" style="display:none;gap:8px;align-items:center;justify-content:space-between"><span id="insttx">Installer APEX PARENTS sur ce téléphone</span><button class="btn or sm" id="instbtn">Installer</button></div>
+<nav><button id="n0" class="on" onclick="tab(0)">Parents</button><button id="n1" onclick="tab(1)">Message</button><button id="n2" onclick="tab(2)">Données</button></nav>
+
+<section id="t0">
+<div class="card">
+<b id="ftitle">Ajouter un parent</b>
+<label>Nom du parent</label><input id="fp" placeholder="Ex. Mme Ouédraogo Awa">
+<label>Nom de l'élève</label><input id="fe" placeholder="Nom et prénom de l'enfant">
+<div class="row"><div><label>Classe</label><input id="fc" placeholder="6ème A" list="cl"></div><div><label>Téléphone du parent</label><input id="ft" type="tel" inputmode="tel" placeholder="70 00 00 00"></div></div>
+<datalist id="cl"></datalist>
+<div class="bar"><button class="btn or" onclick="save()">Enregistrer</button><button class="btn gr hide" id="cancel" onclick="reset()">Annuler</button></div>
+</div>
+<div class="card">
+<div class="row"><div><input id="q" placeholder="Rechercher un parent ou un élève" oninput="draw()"></div><div><select id="fl" onchange="draw()"></select></div></div>
+<div class="bar"><button class="btn sm gr" onclick="selAll(true)">Tout cocher</button><button class="btn sm gr" onclick="selAll(false)">Décocher</button><span id="cnt" style="align-self:center;color:var(--mut);font-size:13px"></span></div>
+<div id="list"></div>
+</div>
+</section>
+
+<section id="t1" class="hide">
+<div class="card">
+<label>Modèle</label>
+<select id="tpl" onchange="useTpl()">
+<option value="0">Convocation</option><option value="1">Réunion de parents</option><option value="2">Frais de scolarité</option><option value="3">Message libre</option>
+</select>
+<div class="row"><div><label>Date</label><input id="md" placeholder="lundi 6 octobre"></div><div><label>Heure</label><input id="mh" placeholder="8h00"></div></div>
+<label>Message (les mots entre accolades sont remplacés pour chaque parent)</label>
+<textarea id="msg" oninput="prev()"></textarea>
+<div class="bar"><span class="tag" onclick="ins('{parent}')">{parent}</span><span class="tag" onclick="ins('{enfant}')">{enfant}</span><span class="tag" onclick="ins('{classe}')">{classe}</span><span class="tag" onclick="ins('{date}')">{date}</span><span class="tag" onclick="ins('{heure}')">{heure}</span></div>
+<small id="prev" style="color:var(--mut)"></small>
+</div>
+<div class="card">
+<b>Destinataires</b>
+<div class="bar"><select id="mf" onchange="drawM()"></select></div>
+<div id="mlist"></div>
+</div>
+</section>
+
+<section id="t2" class="hide">
+<div class="card">
+<b>Sauvegarde</b>
+<p style="color:var(--mut);margin:6px 0">Les données restent dans ce navigateur. Exportez-les régulièrement.</p>
+<div class="bar"><button class="btn" onclick="expJ()">Exporter (JSON)</button><button class="btn or" onclick="expC()">Exporter (CSV)</button></div>
+<label>Importer un fichier JSON</label><input type="file" accept=".json" onchange="impJ(this)">
+<label>Import rapide (une ligne par parent : parent;élève;classe;téléphone)</label>
+<textarea id="bulk" placeholder="Ouédraogo Awa;Ouédraogo Paul;6ème A;70123456"></textarea>
+<div class="bar"><button class="btn" onclick="impB()">Ajouter les lignes</button></div>
+</div>
+</section>
+</main>
+<footer>APEX ÉDUCATION · La Patrie ou la Mort, nous Vaincrons</footer>
+
+<script>
+var D=[],ed=null,sel={},done={};
+var T=["Bonjour {parent}, vous êtes convoqué(e) au CEG de Bounga le {date} à {heure} au sujet de votre enfant {enfant} ({classe}). Merci de vous présenter.",
+"Bonjour {parent}, une réunion des parents d'élèves de la classe de {classe} aura lieu le {date} à {heure}. Votre présence est vivement souhaitée.",
+"Bonjour {parent}, nous vous rappelons que les frais de scolarité de {enfant} ({classe}) sont à régler avant le {date}. Merci.",
+"Bonjour {parent}, "];
+function $(i){return document.getElementById(i)}
+function ld(){try{D=JSON.parse(localStorage.getItem("apexParents")||"[]")}catch(e){D=[]}}
+function sv(){try{localStorage.setItem("apexParents",JSON.stringify(D))}catch(e){}}
+function esc(s){return String(s).replace(/[&<>"]/g,function(c){return{"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]})}
+function num(t){var d=String(t).replace(/\D/g,"");if(d.length==8)d="226"+d;return d}
+function classes(){var c={};D.forEach(function(p){if(p.c)c[p.c]=1});return Object.keys(c).sort()}
+function opts(id){var s=$(id),v=s.value;s.innerHTML='<option value="">Toutes les classes</option>'+classes().map(function(c){return'<option>'+esc(c)+'</option>'}).join("");s.value=v}
+function tab(n){for(var i=0;i<3;i++){$("t"+i).classList.toggle("hide",i!=n);$("n"+i).classList.toggle("on",i==n)}if(n==1){opts("mf");drawM();prev()}}
+function save(){var p={p:$("fp").value.trim(),e:$("fe").value.trim(),c:$("fc").value.trim(),t:$("ft").value.trim()};
+if(!p.p||!p.e||!num(p.t)){alert("Renseignez le parent, l'élève et un numéro valide.");return}
+if(ed!==null){p.id=D[ed].id;D[ed]=p}else{p.id=Date.now()+Math.random();D.push(p)}sv();reset();draw()}
+function reset(){ed=null;["fp","fe","fc","ft"].forEach(function(i){$(i).value=""});$("ftitle").textContent="Ajouter un parent";$("cancel").classList.add("hide")}
+function edit(i){var p=D[i];ed=i;$("fp").value=p.p;$("fe").value=p.e;$("fc").value=p.c;$("ft").value=p.t;$("ftitle").textContent="Modifier le parent";$("cancel").classList.remove("hide");scrollTo(0,0)}
+function del(i){if(confirm("Supprimer "+D[i].p+" ?")){D.splice(i,1);sv();draw()}}
+function flt(q,c){q=q.toLowerCase();return D.map(function(p,i){return{p:p,i:i}}).filter(function(o){return(!c||o.p.c==c)&&(!q||(o.p.p+" "+o.p.e).toLowerCase().indexOf(q)>-1)})}
+function draw(){opts("fl");$("cl").innerHTML=classes().map(function(c){return'<option value="'+esc(c)+'">'}).join("");
+var r=flt($("q").value,$("fl").value);$("cnt").textContent=r.length+" parent(s)";
+$("list").innerHTML=r.length?r.map(function(o){var p=o.p;return'<div class="item"><div class="i"><b>'+esc(p.p)+'</b><small>Élève : '+esc(p.e)+' · '+esc(p.c)+'<br>'+esc(p.t)+'</small></div><div class="acts"><button class="btn sm gr" onclick="edit('+o.i+')">Modifier</button><button class="btn sm gr" onclick="del('+o.i+')">Suppr.</button></div></div>'}).join(""):'<div class="empty">Aucun parent enregistré. Ajoutez-en un ci-dessus.</div>'}
+function selAll(v){flt($("q").value,$("fl").value).forEach(function(o){sel[o.p.id]=v});drawM()}
+function fill(p){return $("msg").value.replace(/\{parent\}/g,p.p).replace(/\{enfant\}/g,p.e).replace(/\{classe\}/g,p.c).replace(/\{date\}/g,$("md").value||"…").replace(/\{heure\}/g,$("mh").value||"…")}
+function useTpl(){$("msg").value=T[$("tpl").value];prev()}
+function ins(s){var m=$("msg");m.value+=s;prev()}
+function prev(){if(!$("msg").value)$("msg").value=T[0];$("prev").textContent=D.length?"Aperçu : "+fill(D[0]):""}
+function drawM(){var r=flt("",$("mf").value);
+$("mlist").innerHTML=r.length?r.map(function(o){var p=o.p,id=p.id;return'<div class="item"><input type="checkbox" '+(sel[id]?"checked":"")+' onchange="sel['+id+']=this.checked"><div class="i"><b>'+esc(p.p)+'</b><small>'+esc(p.e)+' · '+esc(p.c)+'</small> '+(done[id]?'<span class="sent">envoyé</span>':"")+'</div><div class="acts"><a class="btn sm wa" href="#" onclick="return go('+o.i+',\'wa\')">WhatsApp</a><a class="btn sm sms" href="#" onclick="return go('+o.i+',\'sms\')">SMS</a></div></div>'}).join(""):'<div class="empty">Ajoutez des parents dans l\'onglet Parents.</div>'}
+function go(i,k){var p=D[i],m=encodeURIComponent(fill(p)),n=num(p.t);done[p.id]=1;
+var u=k=="wa"?"https://wa.me/"+n+"?text="+m:"sms:+"+n+"?body="+m;window.open(u,k=="wa"?"_blank":"_self");setTimeout(drawM,300);return false}
+function dl(n,t,m){var a=document.createElement("a");a.href=URL.createObjectURL(new Blob([t],{type:m}));a.download=n;a.click()}
+function expJ(){dl("parents-apex.json",JSON.stringify(D),"application/json")}
+function expC(){dl("parents-apex.csv","\ufeffParent;Élève;Classe;Téléphone\n"+D.map(function(p){return[p.p,p.e,p.c,p.t].join(";")}).join("\n"),"text/csv")}
+function impJ(f){var r=new FileReader();r.onload=function(){try{var a=JSON.parse(r.result);if(Array.isArray(a)){D=D.concat(a);sv();draw();alert(a.length+" parent(s) importé(s).")}}catch(e){alert("Fichier invalide.")}};if(f.files[0])r.readAsText(f.files[0])}
+function impB(){var n=0;$("bulk").value.split("\n").forEach(function(l){var s=l.split(";");if(s.length>=4&&num(s[3])){D.push({id:Date.now()+Math.random(),p:s[0].trim(),e:s[1].trim(),c:s[2].trim(),t:s[3].trim()});n++}});sv();$("bulk").value="";draw();alert(n+" ligne(s) ajoutée(s).")}
+if("serviceWorker" in navigator)addEventListener("load",function(){navigator.serviceWorker.register("./sw.js").catch(function(e){console.log("SW",e)})});
+var dp=null,std=matchMedia("(display-mode: standalone)").matches||navigator.standalone;
+var ios=/iphone|ipad|ipod/i.test(navigator.userAgent);
+function showInst(t,b){$("inst").style.display="flex";$("insttx").textContent=t;$("instbtn").style.display=b?"":"none"}
+addEventListener("beforeinstallprompt",function(e){e.preventDefault();dp=e;if(!std)showInst("Installer APEX PARENTS sur ce téléphone",true)});
+$("instbtn").onclick=function(){if(dp){dp.prompt();dp.userChoice.then(function(){dp=null;$("inst").style.display="none"})}};
+addEventListener("appinstalled",function(){$("inst").style.display="none"});
+if(ios&&!std)showInst("Sur iPhone : touchez Partager puis « Sur l'écran d'accueil ».",false);
+ld();draw();$("msg").value=T[0];
+</script>
+</body>
+</html>
